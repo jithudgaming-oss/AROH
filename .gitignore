@@ -1,0 +1,14 @@
+# IDE folders
+.idea/
+.vscode/
+
+# OS files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Secrets and local configurations
+.env
+.env*.local
+*.pem
+*.key

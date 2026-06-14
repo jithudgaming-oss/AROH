@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "aroh",
+    "slug": "aroh",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "ndkVersion": "25.1.8937393",
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.aroh"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "ndkVersion": "25.1.8937393",
+            "minSdkVersion": 24
+          }
+        }
+      ],
+      "expo-status-bar"
+    ]
+  }
+}
