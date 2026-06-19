@@ -16,7 +16,6 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "ndkVersion": "25.1.8937393",
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.aroh"
     },

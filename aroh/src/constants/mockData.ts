@@ -74,7 +74,7 @@ export const MOCK_TREKS: Trek[] = [
     description:
       'A gorgeous trek through dense oak and rhododendron forests leading up to the mysterious skeleton lake nestled high in the Himalayas.',
     imageUrl:
-      'https://images.unsplash.com/photo-1626016752639-2c3b16e3a90c?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?w=600&auto=format&fit=crop',
     startPoint: { latitude: 30.1444, longitude: 79.7397, name: 'Lohajung' },
     coordinates: [
       { latitude: 30.1444, longitude: 79.7397 },
