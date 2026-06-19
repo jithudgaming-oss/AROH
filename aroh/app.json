@@ -24,6 +24,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "@maplibre/maplibre-react-native",
       [
         "expo-build-properties",
         {
@@ -34,6 +35,11 @@
         }
       ],
       "expo-status-bar"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e45ddfcf-896b-4afd-bba3-6065eecad12d"
+      }
+    }
   }
 }

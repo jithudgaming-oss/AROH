@@ -7,7 +7,7 @@ import { COLORS } from './src/constants/colors';
 export default function App() {
   return (
     <SafeAreaProvider>
-      <StatusBar style="light" backgroundColor={COLORS.background} />
+      <StatusBar style="light" />
       <AppNavigator />
     </SafeAreaProvider>
   );

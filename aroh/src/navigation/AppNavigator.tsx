@@ -58,7 +58,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 // Onboarding flow
 function OnboardingNavigator() {
   return (
-    <OnboardingStack.Navigator screenOptions={{ headerShown: false }}>
+    <OnboardingStack.Navigator id="Onboarding" screenOptions={{ headerShown: false }}>
       <OnboardingStack.Screen name="OnboardingAge" component={OnboardingAge} />
       <OnboardingStack.Screen name="OnboardingTerms" component={OnboardingTerms} />
       <OnboardingStack.Screen name="OnboardingEmergency" component={OnboardingEmergency} />
@@ -69,7 +69,7 @@ function OnboardingNavigator() {
 // Home tab stack — trek browsing and detail flow
 function HomeStackNavigator() {
   return (
-    <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+    <HomeStack.Navigator id="Home" screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="HomeScreen" component={HomeScreen} />
       <HomeStack.Screen name="TrekDetail" component={TrekDetailScreen} />
       <HomeStack.Screen name="SeasonPicker" component={SeasonPickerScreen} />
@@ -146,6 +146,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
 function MainTabNavigator() {
   return (
     <Tab.Navigator
+      id="Tab"
       tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
@@ -163,7 +164,7 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      <RootStack.Navigator id="Root" screenOptions={{ headerShown: false }}>
         {!onboarded ? (
           <RootStack.Screen name="Onboarding" component={OnboardingNavigator} />
         ) : (

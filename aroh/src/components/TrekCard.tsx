@@ -72,7 +72,9 @@ export const TrekCard: React.FC<TrekCardProps> = ({ trek, onPress, isDownloaded 
         </View>
 
         <View style={styles.footer}>
-          <SeasonChip season={trek.season} />
+          {trek.seasons.map((s, idx) => (
+            <SeasonChip key={idx} season={s.season} />
+          ))}
         </View>
       </View>
     </Pressable>
