@@ -31,8 +31,10 @@ export interface AppState {
   // GPS Tracking
   isTracking: boolean;
   trackedPath: LocationPoint[];
+  trackingStartTime: number | null;
 
   setTracking: (isTracking: boolean) => void;
+  startTracking: () => void;
   addTrackedPoint: (point: LocationPoint) => void;
   clearTrackedPath: () => void;
 
@@ -60,7 +62,6 @@ export interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      // Onboarding Initial
       onboarded: false,
       age: null,
       emergencyContact: '',
@@ -82,22 +83,20 @@ export const useAppStore = create<AppState>()(
           termsAccepted: false,
         }),
 
-      // Active Trek
       currentTrek: null,
+      setCurrentTrek: (trek) => set({ currentTrek: trek }),
 
-      setCurrentTrek: (trek) =>
-        set({
-          currentTrek: trek,
-        }),
-
-      // GPS Tracking
       isTracking: false,
       trackedPath: [],
+      trackingStartTime: null,
 
-      setTracking: (isTracking) =>
-        set({
-          isTracking,
-        }),
+      setTracking: (isTracking) => set({ isTracking }),
+
+      startTracking: () =>
+        set((state) => ({
+          isTracking: true,
+          trackingStartTime: state.trackingStartTime ?? Date.now(),
+        })),
 
       addTrackedPoint: (point) =>
         set((state) => ({
@@ -107,59 +106,39 @@ export const useAppStore = create<AppState>()(
       clearTrackedPath: () =>
         set({
           trackedPath: [],
+          trackingStartTime: null,
         }),
 
-      // Offline Downloads
       downloadedTrekIds: ['2'],
 
       toggleDownloadTrek: (trekId) =>
         set((state) => {
-          const isDownloaded =
-            state.downloadedTrekIds.includes(trekId);
-
+          const isDownloaded = state.downloadedTrekIds.includes(trekId);
           return {
             downloadedTrekIds: isDownloaded
-              ? state.downloadedTrekIds.filter(
-                (id) => id !== trekId
-              )
+              ? state.downloadedTrekIds.filter((id) => id !== trekId)
               : [...state.downloadedTrekIds, trekId],
           };
         }),
 
-      // Completed Treks
       completedTrekIds: [],
 
       completeTrek: (trekId) =>
         set((state) => ({
-          completedTrekIds:
-            state.completedTrekIds.includes(trekId)
-              ? state.completedTrekIds
-              : [...state.completedTrekIds, trekId],
+          completedTrekIds: state.completedTrekIds.includes(trekId)
+            ? state.completedTrekIds
+            : [...state.completedTrekIds, trekId],
         })),
 
-      // Season Filter
       selectedSeason: null,
+      setSelectedSeason: (selectedSeason) => set({ selectedSeason }),
 
-      setSelectedSeason: (selectedSeason) =>
-        set({
-          selectedSeason,
-        }),
-
-      // Health Verification
       healthVerified: false,
+      setHealthVerified: (healthVerified) => set({ healthVerified }),
 
-      setHealthVerified: (healthVerified) =>
-        set({
-          healthVerified,
-        }),
-
-      // Dark Mode
       isDarkMode: false,
-
       toggleDarkMode: () =>
-        set((state) => ({
-          isDarkMode: !state.isDarkMode,
-        })),
+        set((state) => ({ isDarkMode: !state.isDarkMode })),
     }),
     {
       name: 'aroh-storage',

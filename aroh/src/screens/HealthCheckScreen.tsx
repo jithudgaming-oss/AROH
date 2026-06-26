@@ -11,7 +11,7 @@ import { PrimaryButton } from '../components/PrimaryButton';
 
 export const HealthCheckScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const { currentTrek, setHealthVerified, setTracking, clearTrackedPath } = useAppStore();
+  const { currentTrek, setHealthVerified, startTracking, clearTrackedPath } = useAppStore();
 
   const [checkedO2, setCheckedO2] = useState(false);
   const [checkedWater, setCheckedWater] = useState(false);
@@ -25,7 +25,7 @@ export const HealthCheckScreen: React.FC = () => {
     if (!canStart) return;
     setHealthVerified(true);
     clearTrackedPath();
-    setTracking(true);
+    startTracking();
     navigation.replace('GPSTracking');
   };
 

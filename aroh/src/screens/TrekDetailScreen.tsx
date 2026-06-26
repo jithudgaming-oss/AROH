@@ -1,22 +1,51 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, Pressable } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { MOCK_TREKS } from '../constants/mockData';
+import { Trek } from '../constants/mockData';
 import { COLORS } from '../constants/legacyColors';
 import { TYPOGRAPHY } from '../constants/typography';
 import { StatusBadge } from '../components/StatusBadge';
 import { SeasonChip } from '../components/SeasonChip';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { useAppStore } from '../store/useAppStore';
+import { fetchTrekById } from '../services/trekService';
 
 export const TrekDetailScreen: React.FC = () => {
   const route = useRoute<any>();
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const { trekId } = route.params || { trekId: '1' };
 
-  const trek = MOCK_TREKS.find((t) => t.id === trekId) || MOCK_TREKS[0];
+  const [trek, setTrek] = useState<Trek | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const { downloadedTrekIds, toggleDownloadTrek, setCurrentTrek } = useAppStore();
+
+  useEffect(() => {
+    const loadTrek = async () => {
+      const data = await fetchTrekById(trekId);
+      setTrek(data);
+      setLoading(false);
+    };
+    loadTrek();
+  }, [trekId]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
+    );
+  }
+
+  if (!trek) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={{ color: COLORS.danger }}>Trek not found.</Text>
+      </View>
+    );
+  }
+
   const isDownloaded = downloadedTrekIds.includes(trek.id);
 
   const handleStartTrek = () => {
@@ -32,7 +61,6 @@ export const TrekDetailScreen: React.FC = () => {
     }
   };
 
-  // Data freshness dot color
   const freshnessColor =
     trek.dataVerifiedDaysAgo <= 7
       ? '#1E6B3C'
@@ -49,7 +77,6 @@ export const TrekDetailScreen: React.FC = () => {
         <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
-        {/* Status badge on image */}
         <View style={styles.statusOverlay}>
           <StatusBadge label={trek.status} type={trek.status === 'Open' ? 'success' : 'info'} />
         </View>
@@ -58,7 +85,6 @@ export const TrekDetailScreen: React.FC = () => {
       {/* Main Content */}
       <View style={styles.content}>
 
-        {/* Title and chips */}
         <Text style={[TYPOGRAPHY.h1, styles.title]}>{trek.title}</Text>
 
         <View style={styles.chipRow}>
@@ -68,7 +94,6 @@ export const TrekDetailScreen: React.FC = () => {
           ))}
         </View>
 
-        {/* Data freshness */}
         <View style={styles.freshnessRow}>
           <View style={[styles.freshnessDot, { backgroundColor: freshnessColor }]} />
           <Text style={styles.freshnessText}>
@@ -96,7 +121,7 @@ export const TrekDetailScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Permit info */}
+        {/* Permit */}
         <View style={styles.section}>
           <Text style={[TYPOGRAPHY.h3, styles.sectionTitle]}>Permit</Text>
           <View style={[styles.permitCard, { borderColor: COLORS.border }]}>
@@ -184,52 +209,30 @@ export const TrekDetailScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background },
   imageContainer: { position: 'relative' },
   image: { width: '100%', height: 280, backgroundColor: '#334155' },
   backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
+    position: 'absolute', top: 40, left: 20,
     backgroundColor: 'rgba(15, 23, 42, 0.7)',
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
+    paddingVertical: 8, paddingHorizontal: 14, borderRadius: 20,
   },
   backText: { color: '#FFFFFF', fontWeight: '500', fontSize: 14 },
   statusOverlay: { position: 'absolute', top: 40, right: 20 },
   content: {
-    padding: 24,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    backgroundColor: COLORS.background,
-    marginTop: -24,
+    padding: 24, borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    backgroundColor: COLORS.background, marginTop: -24,
   },
   title: { color: COLORS.textPrimary, marginBottom: 10 },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  freshnessRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center', marginBottom: 12 },
+  freshnessRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   freshnessDot: { width: 8, height: 8, borderRadius: 4, marginRight: 6 },
   freshnessText: { fontSize: 12, color: COLORS.textSecondary },
   description: { color: COLORS.textSecondary, lineHeight: 24, marginBottom: 20 },
   statsContainer: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.cardBg,
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 0.5,
-    borderColor: COLORS.border,
-    marginBottom: 24,
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'row', backgroundColor: COLORS.cardBg, borderRadius: 12,
+    padding: 16, borderWidth: 0.5, borderColor: COLORS.border, marginBottom: 24,
+    justifyContent: 'space-between', alignItems: 'center',
   },
   statBox: { alignItems: 'center', flex: 1 },
   statDivider: { width: 0.5, height: 40, backgroundColor: COLORS.border },
@@ -237,44 +240,18 @@ const styles = StyleSheet.create({
   statVal: { fontSize: 18, fontWeight: '500', color: COLORS.primary },
   section: { marginBottom: 24 },
   sectionTitle: { color: COLORS.textPrimary, marginBottom: 10 },
-  permitCard: {
-    borderWidth: 0.5,
-    borderRadius: 10,
-    padding: 12,
-    backgroundColor: COLORS.cardBg,
-  },
+  permitCard: { borderWidth: 0.5, borderRadius: 10, padding: 12, backgroundColor: COLORS.cardBg },
   permitText: { fontSize: 14, color: COLORS.textPrimary, fontWeight: '500' },
-  costRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 0.5,
-    borderBottomColor: COLORS.divider,
-  },
+  costRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 0.5, borderBottomColor: COLORS.divider },
   costLabel: { fontSize: 13, color: COLORS.textSecondary },
   costValue: { fontSize: 13, color: COLORS.textPrimary, fontWeight: '500' },
-  dayRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 10,
-    gap: 12,
-  },
-  dayBadge: {
-    backgroundColor: COLORS.primaryLight,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
+  dayRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10, gap: 12 },
+  dayBadge: { backgroundColor: COLORS.primaryLight, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
   dayBadgeText: { fontSize: 12, color: COLORS.primary, fontWeight: '500' },
   dayInfo: { flex: 1 },
   dayRoute: { fontSize: 14, color: COLORS.textPrimary, fontWeight: '500' },
   dayMeta: { fontSize: 12, color: COLORS.textSecondary, marginTop: 2 },
-  bulletRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-    paddingRight: 10,
-  },
+  bulletRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8, paddingRight: 10 },
   bullet: { color: COLORS.primary, fontSize: 16, lineHeight: 20, marginRight: 8 },
   bulletText: { color: COLORS.textSecondary, lineHeight: 20, flex: 1 },
   actionContainer: { marginTop: 8, marginBottom: 40 },

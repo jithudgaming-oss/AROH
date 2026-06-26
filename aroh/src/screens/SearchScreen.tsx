@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,20 +7,18 @@ import {
   ScrollView,
   Pressable,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-// import MapLibreGL from '@maplibre/maplibre-react-native';
+import { Map, Camera, Marker } from '@maplibre/maplibre-react-native';
 import { COLORS } from '../constants/legacyColors';
 import { TYPOGRAPHY } from '../constants/typography';
-import { MOCK_TREKS, Trek } from '../constants/mockData';
+import { Trek } from '../constants/mockData';
 import { TrekCard } from '../components/TrekCard';
 import { useAppStore } from '../store/useAppStore';
-
-// const MapLibre = MapLibreGL.default || MapLibreGL;
-// MapLibreGL.setAccessToken(null);
-
+import { fetchTreks } from '../services/trekService';
 
 type DifficultyFilter = 'All' | Trek['difficulty'];
 
@@ -39,10 +37,21 @@ export const SearchScreen: React.FC = () => {
   const { downloadedTrekIds } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyFilter>('All');
+  const [treks, setTreks] = useState<Trek[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadTreks = async () => {
+      const data = await fetchTreks();
+      setTreks(data);
+      setLoading(false);
+    };
+    loadTreks();
+  }, []);
 
   const difficulties: DifficultyFilter[] = ['All', 'Easy', 'Moderate', 'Challenging', 'Expert'];
 
-  const filteredTreks = MOCK_TREKS.filter((trek) => {
+  const filteredTreks = treks.filter((trek) => {
     const matchesSearch =
       trek.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       trek.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -53,12 +62,30 @@ export const SearchScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={[styles.mapContainer, { height: MAP_HEIGHT, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.cardBg }]}>
-        <Text style={{ color: COLORS.textSecondary, fontSize: 16, fontWeight: '500' }}>
-          Map View Placeholder (Expo Go)
-        </Text>
+      <View style={[styles.mapContainer, { height: MAP_HEIGHT }]}>
+        <Map
+          style={styles.map}
+          mapStyle="https://demotiles.maplibre.org/style.json"
+          logo={false}
+          attribution={false}
+        >
+          <Camera initialViewState={{ center: [79.5, 30.5], zoom: 4 }} />
+          {treks.map((trek) => (
+            <Marker
+              key={trek.id}
+              lngLat={[trek.startPoint.longitude, trek.startPoint.latitude]}
+              onPress={() => navigation.navigate('Home' as any, {
+                screen: 'TrekDetail',
+                params: { trekId: trek.id },
+              })}
+            >
+              <Pressable style={[styles.pin, { backgroundColor: DIFFICULTY_COLORS[trek.difficulty] }]}>
+                <Text style={styles.pinText}>{trek.title.split(' ')[0]}</Text>
+              </Pressable>
+            </Marker>
+          ))}
+        </Map>
       </View>
-
 
       <View style={styles.header}>
         <View style={styles.searchContainer}>
@@ -89,7 +116,11 @@ export const SearchScreen: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {filteredTreks.length === 0 ? (
+        {loading ? (
+          <View style={styles.emptyContainer}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+          </View>
+        ) : filteredTreks.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={[TYPOGRAPHY.bodyLarge, styles.emptyText]}>No treks match your search criteria.</Text>
           </View>

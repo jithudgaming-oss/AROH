@@ -25,7 +25,7 @@ export const TrekStatusScreen: React.FC = () => {
 
         <Text style={[TYPOGRAPHY.h1, styles.title]}>Trek Logged!</Text>
         <Text style={[TYPOGRAPHY.bodyLarge, styles.subtitle]}>
-          Congratulations on completing the **{currentTrek?.title || 'Trek peak climb'}**! Your GPS logs are saved.
+          Congratulations on completing {currentTrek?.title || 'Trek peak climb'}! Your GPS logs are saved.
         </Text>
 
         {/* Stats card */}

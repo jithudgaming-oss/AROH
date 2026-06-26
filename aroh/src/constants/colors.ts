@@ -29,17 +29,15 @@ export const Colors = {
 // Backward-compatible alias — default to dark theme.
 // All existing screens/components import `COLORS` and keep working.
 export const COLORS = {
-  ...Colors.dark,
-
-  // Extended tokens derived from the dark palette
+  ...Colors.light, // ← was Colors.dark, now light
   primaryDark: '#1E6B3C',
-  cardBg: Colors.dark.surface,
-  cardBgHover: '#243D2C',
-  textMuted: '#6B7B6E',
-  success: Colors.dark.primary,
-  error: Colors.dark.danger,
-  warning: Colors.dark.accent,
+  cardBg: Colors.light.surface,
+  cardBgHover: '#E8F5E9',
+  textMuted: '#9CA3AF',
+  success: Colors.light.primary,
+  error: Colors.light.danger,
+  warning: Colors.light.accent,
   info: '#3B82F6',
-  borderLight: '#3A4A40',
-  overlay: 'rgba(15, 22, 18, 0.75)',
+  borderLight: '#E8EDE8',
+  overlay: 'rgba(0, 0, 0, 0.5)',
 };

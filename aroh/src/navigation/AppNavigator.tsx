@@ -3,10 +3,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../constants/colors';
 import { useAppStore } from '../store/useAppStore';
 
-// Screen imports — these files are empty for now, we fill them one by one
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import MyTreksScreen from '../screens/MyTreksScreen';
@@ -21,7 +21,6 @@ import HealthCheckScreen from '../screens/HealthCheckScreen';
 import OfflineDownloadScreen from '../screens/OfflineDownloadScreen';
 import TrekStatusScreen from '../screens/TrekStatusScreen';
 
-// Type definitions for navigation
 export type RootStackParamList = {
   Onboarding: undefined;
   MainApp: undefined;
@@ -55,7 +54,6 @@ const OnboardingStack = createNativeStackNavigator<OnboardingStackParamList>();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-// Onboarding flow
 function OnboardingNavigator() {
   return (
     <OnboardingStack.Navigator id="Onboarding" screenOptions={{ headerShown: false }}>
@@ -66,7 +64,6 @@ function OnboardingNavigator() {
   );
 }
 
-// Home tab stack — trek browsing and detail flow
 function HomeStackNavigator() {
   return (
     <HomeStack.Navigator id="Home" screenOptions={{ headerShown: false }}>
@@ -81,10 +78,10 @@ function HomeStackNavigator() {
   );
 }
 
-// Custom bottom tab bar
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const isDarkMode = useAppStore((s) => s.isDarkMode);
   const C = isDarkMode ? Colors.dark : Colors.light;
+  const insets = useSafeAreaInsets();
 
   const tabs = [
     { name: 'Home', label: 'Home', icon: '⌂' },
@@ -94,7 +91,15 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   ];
 
   return (
-    <View style={[styles.tabBar, { backgroundColor: C.background, borderTopColor: C.border }]}>
+    <View style={[
+      styles.tabBar,
+      {
+        backgroundColor: C.background,
+        borderTopColor: C.border,
+        paddingBottom: insets.bottom || 12,
+        height: 60 + (insets.bottom || 12),
+      }
+    ]}>
       {state.routes.map((route: any, index: number) => {
         const isFocused = state.index === index;
         const tab = tabs[index];
@@ -142,7 +147,6 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   );
 }
 
-// Main app tabs
 function MainTabNavigator() {
   return (
     <Tab.Navigator
@@ -158,7 +162,6 @@ function MainTabNavigator() {
   );
 }
 
-// Root navigator — decides onboarding vs main app
 export default function AppNavigator() {
   const onboarded = useAppStore((s) => s.onboarded);
 
@@ -179,9 +182,7 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     borderTopWidth: 0.5,
-    paddingBottom: 20,
     paddingTop: 10,
-    height: 70,
   },
   tabItem: {
     flex: 1,
